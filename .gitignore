@@ -1,0 +1,21 @@
+# Environment variables
+*.env
+api_keys.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.npy
+
+# Vector DB persistence
+chroma_db/
+faiss_index/
+*.log
+
+# IDE/project settings
+.vscode/
+.idea/
+.DS_Store

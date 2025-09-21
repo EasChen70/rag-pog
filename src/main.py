@@ -8,7 +8,7 @@ from generator import ask_llm
 warnings.filterwarnings("ignore", category=UserWarning)
 
 
-def run_query(query: str, retriever, k: int = 3):
+def run_query(query: str, retriever, debug: bool = False):
     # Step 1: Retrieve relevant chunks
     docs = retriever.invoke(query)
     print(f"\n[Retrieved {len(docs)} chunks]\n")
@@ -17,6 +17,13 @@ def run_query(query: str, retriever, k: int = 3):
     for i, doc in enumerate(docs, start=1):
         source = doc.metadata.get("source", "unknown")
         print(f"  Chunk {i} from {source}")
+
+    # Optional: show retrieved chunk content (first 300 chars)
+    if debug:
+        print("\n--- Retrieved Chunks (preview) ---")
+        for i, doc in enumerate(docs, start=1):
+            print(f"\n[Chunk {i}]")
+            print(doc.page_content[:300])
 
     # Step 2: Assemble prompt with retrieved docs + query
     prompt = assemble_context(docs, query)
@@ -30,12 +37,12 @@ def run_query(query: str, retriever, k: int = 3):
 
 def main():
     # Load retriever from persisted Chroma DB
-    retriever = get_retriever("./chroma_db", k=3)
+    retriever = get_retriever("./chroma_db")
 
     # Case 1: Query passed via command-line args
     if len(sys.argv) > 1:
         query = " ".join(sys.argv[1:])
-        run_query(query, retriever)
+        run_query(query, retriever, debug=True)  # debug mode for CLI args
         return
 
     # Case 2: Interactive loop
@@ -47,7 +54,7 @@ def main():
             if query.lower() in ["quit", "exit"]:
                 print("Goodbye!")
                 break
-            run_query(query, retriever)
+            run_query(query, retriever, debug=False)
     except KeyboardInterrupt:
         print("\nExiting...")
 

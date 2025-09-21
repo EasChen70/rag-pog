@@ -37,8 +37,8 @@ def build_vector_store(chunks_path="chunks.pkl", persist_dir="./chroma_db"):
     return db
 
 
-def get_retriever(persist_dir="./chroma_db", k=3):
-    """Load existing Chroma DB and return a retriever."""
+def get_retriever(persist_dir="./chroma_db", k=8):
+    """Load existing Chroma DB and return a retriever (using MMR)."""
 
     # Must reinitialize the same embedding function for retrieval
     embedding_function = OpenAIEmbeddings(
@@ -53,13 +53,18 @@ def get_retriever(persist_dir="./chroma_db", k=3):
     )
 
     # Retriever will fetch top-k most relevant chunks
-    return db.as_retriever(search_kwargs={"k": k})
+    # Use MMR (maximal marginal relevance) to increase diversity
+    return db.as_retriever(
+        search_type="mmr",
+        search_kwargs={"k": k, "fetch_k": max(20, k*3), "lambda_mult": 0.5}
+    )
 
 
 # Quick test if run directly
 if __name__ == "__main__":
     build_vector_store()
-    retriever = get_retriever()
-    results = retriever.invoke("checkbox")
+    retriever = get_retriever(k=8)
+    results = retriever.invoke("logout button selector in DashboardPanel")
     for doc in results:
+        print("\n--- Retrieved Chunk ---")
         print(doc.page_content[:200])

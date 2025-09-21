@@ -39,7 +39,7 @@ def assemble_context(docs: List[Document], query: str, max_chunks: int = 5, max_
     context_text = "\n".join(context_parts).strip()
 
     # Final stitched prompt
-    prompt = f"""Use the following context to answer the question.
+    prompt = f"""Use the following context to answer the question cite sources/file names.
     If the answer is not in the context, say "I don’t know."
 
     {context_text}

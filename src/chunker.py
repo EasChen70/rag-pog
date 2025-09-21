@@ -52,7 +52,7 @@ code_splitter = RecursiveCharacterTextSplitter(
 )
 
 # Split the documents
-chunks = text_splitter.split_documents(documents)
+chunks = code_splitter.split_documents(documents)
 
 with open("chunks.pkl", "wb") as f:
     pickle.dump(chunks, f)

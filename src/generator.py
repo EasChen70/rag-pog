@@ -12,7 +12,13 @@ def ask_llm(prompt: str, model: str = "gpt-4o-mini") -> str:
         raise RuntimeError("Missing OPENAI_API_KEY in api_keys.env")
     
     # Initialize the LLM
-    llm = ChatOpenAI(model=model, openai_api_key=api_key, temperature=0)
+    llm = ChatOpenAI(
+        model=model, 
+        openai_api_key=api_key, 
+        temperature=0,
+        max_tokens=2000 #bumped
+
+    )
 
     # Call the model
     response = llm.invoke(prompt)

@@ -19,3 +19,7 @@ faiss_index/
 .vscode/
 .idea/
 .DS_Store
+
+
+# Build files
+*.bat

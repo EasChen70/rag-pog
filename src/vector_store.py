@@ -54,9 +54,10 @@ def get_retriever(persist_dir="./chroma_db", k=8):
 
     # Retriever will fetch top-k most relevant chunks
     # Use MMR (maximal marginal relevance) to increase diversity
+    # Use to balance between relevance and diversity
     return db.as_retriever(
         search_type="mmr",
-        search_kwargs={"k": k, "fetch_k": max(20, k*3), "lambda_mult": 0.5}
+        search_kwargs={"k": k, "fetch_k": max(20, k*3), "lambda_mult": 0.5} # 1 = relvance, 0 = diversity
     )
 
 

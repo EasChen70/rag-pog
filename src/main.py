@@ -1,22 +1,27 @@
 import sys
+import os
 import warnings
 from vector_store import get_retriever
 from context_assembler import assemble_context
-from generator import ask_llm
+from generator import ask_llm, output_pojs
+from naming import infer_filename
 
 # Suppress noisy LangChain warnings for cleaner UX
 warnings.filterwarnings("ignore", category=UserWarning)
 
 
-def run_query(query: str, retriever, debug: bool = False):
+def run_query(query: str, retriever, debug: bool = False, save: bool = True):
     # Step 1: Retrieve relevant chunks
     docs = retriever.invoke(query)
     print(f"\n[Retrieved {len(docs)} chunks]\n")
 
     # Print chunk sources for transparency
+    sources = []
     for i, doc in enumerate(docs, start=1):
         source = doc.metadata.get("source", "unknown")
         print(f"  Chunk {i} from {source}")
+        if source != "unknown":
+            sources.append(source)
 
     # Optional: show retrieved chunk content (first 300 chars)
     if debug:
@@ -34,6 +39,11 @@ def run_query(query: str, retriever, debug: bool = False):
     # Display answer
     print(f"\nAnswer:\n{answer}\n")
 
+    # Step 4: Save result with inferred filename from naming.py
+    if save:
+        filename = infer_filename(query, sources)
+        output_pojs(answer, filename)
+
 
 def main():
     # Load retriever from persisted Chroma DB
@@ -42,7 +52,7 @@ def main():
     # Case 1: Query passed via command-line args
     if len(sys.argv) > 1:
         query = " ".join(sys.argv[1:])
-        run_query(query, retriever, debug=True)  # debug mode for CLI args
+        run_query(query, retriever, debug=True, save=True)  # debug mode for CLI args
         return
 
     # Case 2: Interactive loop
@@ -54,7 +64,7 @@ def main():
             if query.lower() in ["quit", "exit"]:
                 print("Goodbye!")
                 break
-            run_query(query, retriever, debug=False)
+            run_query(query, retriever, debug=False, save=True)
     except KeyboardInterrupt:
         print("\nExiting...")
 

@@ -25,3 +25,13 @@ def ask_llm(prompt: str, model: str = "gpt-4o-mini") -> str:
 
     # Return just the text content
     return response.content.strip()
+
+def output_pojs(content: str, filename: str, out_dir: str = "artifacts"):
+    #Save generated Page Object code as .po.js in artifacts/ directory
+    os.makedirs(out_dir, exist_ok=True)
+    filepath = os.path.join(out_dir, filename)
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write(content)
+    print(f"[OK] Saved generated file → {filepath}")
+
+    
